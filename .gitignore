@@ -1,0 +1,17 @@
+# Editor & tool configs
+.vscode/
+.kiro/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node / Python (future-proof)
+node_modules/
+__pycache__/
+
+# Environment files
+.env

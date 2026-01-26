@@ -1,0 +1,326 @@
+{
+  "products": {
+    "rice": {
+      "category": "grains",
+      "marketPrice": 45,
+      "minPrice": 40,
+      "maxPrice": 50,
+      "bulkThreshold": 10,
+      "bulkDiscount": 0.1,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [10, 11, 12], "priceMultiplier": 0.9 },
+        "low": { "months": [4, 5, 6], "priceMultiplier": 1.1 }
+      },
+      "quality": ["premium", "standard", "economy"],
+      "commonNames": ["chawal", "akki", "rice", "bhat"]
+    },
+    "wheat": {
+      "category": "grains",
+      "marketPrice": 35,
+      "minPrice": 30,
+      "maxPrice": 40,
+      "bulkThreshold": 15,
+      "bulkDiscount": 0.12,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [3, 4, 5], "priceMultiplier": 0.85 },
+        "low": { "months": [8, 9, 10], "priceMultiplier": 1.15 }
+      },
+      "quality": ["premium", "standard"],
+      "commonNames": ["gehun", "godhi", "wheat", "atta"]
+    },
+    "onions": {
+      "category": "vegetables",
+      "marketPrice": 25,
+      "minPrice": 20,
+      "maxPrice": 30,
+      "bulkThreshold": 5,
+      "bulkDiscount": 0.08,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [11, 12, 1, 2], "priceMultiplier": 0.8 },
+        "low": { "months": [6, 7, 8], "priceMultiplier": 1.4 }
+      },
+      "quality": ["large", "medium", "small"],
+      "commonNames": ["pyaaz", "eerulli", "onion", "kanda"]
+    },
+    "tomatoes": {
+      "category": "vegetables",
+      "marketPrice": 40,
+      "minPrice": 35,
+      "maxPrice": 45,
+      "bulkThreshold": 3,
+      "bulkDiscount": 0.05,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [12, 1, 2, 3], "priceMultiplier": 0.75 },
+        "low": { "months": [6, 7, 8, 9], "priceMultiplier": 1.5 }
+      },
+      "quality": ["premium", "standard", "cooking"],
+      "commonNames": ["tamatar", "tamata", "tomato", "thakkali"]
+    },
+    "potatoes": {
+      "category": "vegetables",
+      "marketPrice": 20,
+      "minPrice": 18,
+      "maxPrice": 25,
+      "bulkThreshold": 10,
+      "bulkDiscount": 0.1,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [1, 2, 3, 4], "priceMultiplier": 0.85 },
+        "low": { "months": [7, 8, 9], "priceMultiplier": 1.2 }
+      },
+      "quality": ["large", "medium", "small"],
+      "commonNames": ["aloo", "aalugadde", "potato", "batata"]
+    },
+    "milk": {
+      "category": "dairy",
+      "marketPrice": 55,
+      "minPrice": 50,
+      "maxPrice": 60,
+      "bulkThreshold": 5,
+      "bulkDiscount": 0.05,
+      "unit": "liter",
+      "seasonal": {
+        "peak": { "months": [11, 12, 1, 2], "priceMultiplier": 1.05 },
+        "low": { "months": [6, 7, 8], "priceMultiplier": 0.95 }
+      },
+      "quality": ["full cream", "toned", "double toned"],
+      "commonNames": ["doodh", "haalu", "milk", "ksheer"]
+    },
+    "eggs": {
+      "category": "dairy",
+      "marketPrice": 6,
+      "minPrice": 5,
+      "maxPrice": 7,
+      "bulkThreshold": 30,
+      "bulkDiscount": 0.08,
+      "unit": "piece",
+      "seasonal": {
+        "peak": { "months": [10, 11, 12, 1], "priceMultiplier": 0.95 },
+        "low": { "months": [5, 6, 7], "priceMultiplier": 1.1 }
+      },
+      "quality": ["large", "medium", "small"],
+      "commonNames": ["anda", "motte", "egg", "guddu"]
+    },
+    "chicken": {
+      "category": "meat",
+      "marketPrice": 180,
+      "minPrice": 160,
+      "maxPrice": 200,
+      "bulkThreshold": 2,
+      "bulkDiscount": 0.05,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [10, 11, 12, 1, 2], "priceMultiplier": 1.1 },
+        "low": { "months": [6, 7, 8], "priceMultiplier": 0.9 }
+      },
+      "quality": ["country", "broiler", "organic"],
+      "commonNames": ["murgi", "koli", "chicken", "kozhi"]
+    },
+    "fish": {
+      "category": "meat",
+      "marketPrice": 250,
+      "minPrice": 220,
+      "maxPrice": 280,
+      "bulkThreshold": 1,
+      "bulkDiscount": 0.03,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [11, 12, 1, 2], "priceMultiplier": 0.9 },
+        "low": { "months": [6, 7, 8, 9], "priceMultiplier": 1.2 }
+      },
+      "quality": ["fresh", "frozen", "sea", "river"],
+      "commonNames": ["machli", "meenu", "fish", "meen"]
+    },
+    "apples": {
+      "category": "fruits",
+      "marketPrice": 120,
+      "minPrice": 100,
+      "maxPrice": 140,
+      "bulkThreshold": 2,
+      "bulkDiscount": 0.07,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [9, 10, 11, 12], "priceMultiplier": 0.8 },
+        "low": { "months": [4, 5, 6], "priceMultiplier": 1.3 }
+      },
+      "quality": ["premium", "standard", "local"],
+      "commonNames": ["seb", "sebu", "apple", "seebu"]
+    },
+    "bananas": {
+      "category": "fruits",
+      "marketPrice": 50,
+      "minPrice": 45,
+      "maxPrice": 55,
+      "bulkThreshold": 5,
+      "bulkDiscount": 0.1,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [1, 2, 3, 4], "priceMultiplier": 0.9 },
+        "low": { "months": [8, 9, 10], "priceMultiplier": 1.1 }
+      },
+      "quality": ["ripe", "raw", "small", "large"],
+      "commonNames": ["kela", "balehannu", "banana", "vazhai"]
+    },
+    "mangoes": {
+      "category": "fruits",
+      "marketPrice": 80,
+      "minPrice": 70,
+      "maxPrice": 90,
+      "bulkThreshold": 3,
+      "bulkDiscount": 0.08,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [4, 5, 6], "priceMultiplier": 0.7 },
+        "low": { "months": [10, 11, 12, 1], "priceMultiplier": 2.0 }
+      },
+      "quality": ["alphonso", "totapuri", "badami", "local"],
+      "commonNames": ["aam", "mavina", "mango", "maanga"]
+    },
+    "oil": {
+      "category": "cooking",
+      "marketPrice": 140,
+      "minPrice": 130,
+      "maxPrice": 150,
+      "bulkThreshold": 2,
+      "bulkDiscount": 0.05,
+      "unit": "liter",
+      "seasonal": {
+        "peak": { "months": [11, 12, 1], "priceMultiplier": 1.05 },
+        "low": { "months": [6, 7, 8], "priceMultiplier": 0.95 }
+      },
+      "quality": ["refined", "cold pressed", "mustard", "coconut"],
+      "commonNames": ["tel", "enne", "oil", "taila"]
+    },
+    "sugar": {
+      "category": "cooking",
+      "marketPrice": 42,
+      "minPrice": 40,
+      "maxPrice": 45,
+      "bulkThreshold": 5,
+      "bulkDiscount": 0.06,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [2, 3, 4], "priceMultiplier": 0.95 },
+        "low": { "months": [8, 9, 10], "priceMultiplier": 1.05 }
+      },
+      "quality": ["refined", "raw", "organic"],
+      "commonNames": ["cheeni", "sakkare", "sugar", "sakkarai"]
+    },
+    "salt": {
+      "category": "cooking",
+      "marketPrice": 20,
+      "minPrice": 18,
+      "maxPrice": 22,
+      "bulkThreshold": 10,
+      "bulkDiscount": 0.1,
+      "unit": "kg",
+      "seasonal": {
+        "peak": { "months": [1, 2, 3, 4], "priceMultiplier": 0.95 },
+        "low": { "months": [7, 8, 9], "priceMultiplier": 1.05 }
+      },
+      "quality": ["iodized", "rock", "sea", "table"],
+      "commonNames": ["namak", "uppu", "salt", "lavana"]
+    }
+  },
+  "categories": {
+    "grains": {
+      "defaultMargin": 0.15,
+      "seasonalVariation": 0.1,
+      "storageLife": "6-12 months",
+      "negotiationTips": "Grains have stable prices, focus on quality and bulk discounts"
+    },
+    "vegetables": {
+      "defaultMargin": 0.2,
+      "seasonalVariation": 0.25,
+      "storageLife": "1-7 days",
+      "negotiationTips": "Vegetable prices vary daily, emphasize freshness and quick sale"
+    },
+    "fruits": {
+      "defaultMargin": 0.18,
+      "seasonalVariation": 0.3,
+      "storageLife": "2-10 days",
+      "negotiationTips": "Fruit prices are highly seasonal, highlight ripeness and quality"
+    },
+    "dairy": {
+      "defaultMargin": 0.12,
+      "seasonalVariation": 0.05,
+      "storageLife": "1-3 days",
+      "negotiationTips": "Dairy has consistent demand, focus on freshness and regular supply"
+    },
+    "meat": {
+      "defaultMargin": 0.15,
+      "seasonalVariation": 0.15,
+      "storageLife": "1-2 days",
+      "negotiationTips": "Meat prices vary with festivals, emphasize freshness and source"
+    },
+    "cooking": {
+      "defaultMargin": 0.1,
+      "seasonalVariation": 0.08,
+      "storageLife": "6-24 months",
+      "negotiationTips": "Cooking essentials have steady demand, offer bulk deals"
+    }
+  },
+  "negotiationRules": {
+    "maxDiscount": 0.15,
+    "bulkDiscountThreshold": 0.2,
+    "culturalFactors": {
+      "respectfulDecline": {
+        "english": "I appreciate your interest, but this is my best price.",
+        "hindi": "Aapka interest ke liye dhanyawad, lekin yeh mera best price hai.",
+        "kannada": "Nimma interest ge dhanyawaadagalu, aadare idu nanna best price."
+      },
+      "counterOfferPhrase": {
+        "english": "How about we meet in the middle?",
+        "hindi": "Kya hum beech mein mil sakte hain?",
+        "kannada": "Naavu naduve meet aagona?"
+      },
+      "bulkIncentive": {
+        "english": "For larger quantities, I can offer a better rate.",
+        "hindi": "Jyada quantity ke liye main better rate de sakta hun.",
+        "kannada": "Jaasti quantity ge naanu better rate koduttene."
+      },
+      "qualityEmphasis": {
+        "english": "This is premium quality, worth the price.",
+        "hindi": "Yeh premium quality hai, price ke layak hai.",
+        "kannada": "Idu premium quality, price ge layak ide."
+      },
+      "seasonalExplanation": {
+        "english": "Prices are higher/lower due to seasonal availability.",
+        "hindi": "Season ke karan prices jyada/kam hain.",
+        "kannada": "Season gaagi prices jaasti/kammi ide."
+      }
+    },
+    "marketConditions": {
+      "highDemand": "Market demand is high today, prices are firm.",
+      "lowDemand": "Market is slow, I can be flexible with pricing.",
+      "festivalSeason": "Festival season affects pricing, but I value regular customers.",
+      "weatherImpact": "Weather has affected supply, impacting current prices."
+    },
+    "_documentation": {
+      "maxDiscount": "Maximum discount percentage (15% of market price)",
+      "bulkDiscountThreshold": "Minimum quantity multiplier to qualify for bulk pricing (20% above normal purchase)",
+      "note": "bulkDiscountThreshold is percentage of typical purchase quantity, not price"
+    }
+  },
+  "regionalFactors": {
+    "urban": {
+      "priceMultiplier": 1.1,
+      "negotiationStyle": "direct",
+      "timePreference": "quick"
+    },
+    "rural": {
+      "priceMultiplier": 0.9,
+      "negotiationStyle": "relationship-based",
+      "timePreference": "patient"
+    },
+    "market": {
+      "priceMultiplier": 1.0,
+      "negotiationStyle": "competitive",
+      "timePreference": "efficient"
+    }
+  }
+}
