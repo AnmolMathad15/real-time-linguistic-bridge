@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Response Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .passed { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .failed { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .error { background-color: #fff3cd; border: 1px solid #ffeaa7; }
+        .response-text { font-style: italic; margin-top: 5px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🌍 Multilingual Response Test</h1>
+    <button onclick="runTests()">Run Tests</button>
+    <div id="results"></div>
+
+    <script src="frontend/script.js"></script>
+    <script>
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Running tests...</h2>';
+            
+            try {
+                // Initialize ResponseGenerator
+                const responseGenerator = new ResponseGenerator();
+                
+                // Test data
+                const testData = {
+                    intent: { type: 'price_inquiry', product: 'tomatoes' },
+                    priceData: { 
+                        product: 'tomatoes', 
+                        marketPrice: 50, 
+                        unit: 'kg',
+                        ranges: { minimum: 40, premium: 60 },
+                        negotiation: { flexibility: 'moderate' }
+                    },
+                    negotiationGuidance: {
+                        counterOffers: [{
+                            price: 45,
+                            message: 'Good price for bulk',
+                            recommended: true
+                        }],
+                        culturalContext: {
+                            customary: ['Maintain respectful dialogue']
+                        },
+                        confidence: 0.8
+                    }
+                };
+                
+                // Test languages
+                const testLanguages = [
+                    { code: 'en-US', name: 'English', indicator: 'market range' },
+                    { code: 'hi-IN', name: 'Hindi', indicator: 'bazaar' },
+                    { code: 'kn-IN', name: 'Kannada', indicator: 'market' },
+                    { code: 'ta-IN', name: 'Tamil', indicator: 'sandhai' },
+                    { code: 'te-IN', name: 'Telugu', indicator: 'market' },
+                    { code: 'bn-IN', name: 'Bengali', indicator: 'bazaar' },
+                    { code: 'mr-IN', name: 'Marathi', indicator: 'bazaar' },
+                    { code: 'gu-IN', name: 'Gujarati', indicator: 'bazaar' }
+                ];
+                
+                let html = '<h2>Test Results:</h2>';
+                let passed = 0, failed = 0;
+                
+                for (const lang of testLanguages) {
+                    try {
+                        const response = await responseGenerator.formatResponse(testData, lang.code);
+                        
+                        const isValid = response.text && 
+                                       response.text.length > 0 && 
+                                       !response.fallback &&
+                                       response.language === responseGenerator.normalizeLanguage(lang.code);
+                        
+                        if (isValid) {
+                            html += `<div class="test-result passed">
+                                <strong>✅ ${lang.name} (${lang.code})</strong>
+                                <div class="response-text">"${response.text}"</div>
+                            </div>`;
+                            passed++;
+                        } else {
+                            html += `<div class="test-result failed">
+                                <strong>❌ ${lang.name} (${lang.code})</strong>
+                                <div>Issues: ${!response.text ? 'No text' : ''} ${response.fallback ? 'Fallback used' : ''}</div>
+                                <div class="response-text">"${response.text || 'No response'}"</div>
+                            </div>`;
+                            failed++;
+                        }
+                    } catch (error) {
+                        html += `<div class="test-result error">
+                            <strong>💥 ${lang.name} (${lang.code})</strong>
+                            <div>Error: ${error.message}</div>
+                        </div>`;
+                        failed++;
+                    }
+                }
+                
+                html += `<div style="margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 5px;">
+                    <h3>Summary</h3>
+                    <p>✅ Passed: ${passed}</p>
+                    <p>❌ Failed: ${failed}</p>
+                    <p>📈 Success Rate: ${((passed / testLanguages.length) * 100).toFixed(1)}%</p>
+                </div>`;
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="test-result error">
+                    <strong>💥 Test Setup Error</strong>
+                    <div>${error.message}</div>
+                </div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -3,61 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Fixes - Real-Time Linguistic Bridge</title>
+    <title>Quick Test - Core Functionality</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
-        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
-    <h1>Testing Critical Fixes</h1>
-    <p><em>This page is for internal verification only and is not part of the production application.</em></p>
+    <h1>Quick Core Functionality Test</h1>
     <div id="results"></div>
 
+    <script src="tests/test-setup.js"></script>
+    <script src="frontend/script.js"></script>
+    
     <script>
-        const results = document.getElementById('results');
-        
-        function addResult(test, passed, message) {
-            const div = document.createElement('div');
-            div.className = `test-result ${passed ? 'pass' : 'fail'}`;
-            div.innerHTML = `<strong>${test}:</strong> ${passed ? 'PASS' : 'FAIL'} - ${message}`;
-            results.appendChild(div);
+        async function runQuickTest() {
+            const results = document.getElementById('results');
+            
+            function addResult(name, passed, details) {
+                const div = document.createElement('div');
+                div.className = `result ${passed ? 'pass' : 'fail'}`;
+                div.innerHTML = `<strong>${passed ? '✅' : '❌'} ${name}</strong><br>${details}`;
+                results.appendChild(div);
+            }
+            
+            // Test 1: Classes are defined
+            try {
+                const classNames = ['LinguisticBridge', 'IntentClassifier', 'PriceDiscoveryEngine'];
+                let allDefined = true;
+                let missing = [];
+                
+                for (const className of classNames) {
+                    if (typeof window[className] === 'undefined') {
+                        allDefined = false;
+                        missing.push(className);
+                    }
+                }
+                
+                addResult('Classes Defined', allDefined, 
+                    allDefined ? 'All core classes are available' : `Missing: ${missing.join(', ')}`);
+            } catch (error) {
+                addResult('Classes Defined', false, error.message);
+            }
+            
+            // Test 2: Intent Classification
+            try {
+                const classifier = new IntentClassifier();
+                const intent = await classifier.classifyIntent('price kya hai', 'hindi');
+                
+                const isValid = intent && typeof intent.type === 'string' && typeof intent.confidence === 'number';
+                addResult('Intent Classification', isValid, 
+                    isValid ? `Type: ${intent.type}, Confidence: ${intent.confidence}` : 'Invalid result');
+            } catch (error) {
+                addResult('Intent Classification', false, error.message);
+            }
+            
+            // Test 3: Price Discovery
+            try {
+                const priceEngine = new PriceDiscoveryEngine();
+                priceEngine.loadPriceData({
+                    products: { rice: { marketPrice: 60, minPrice: 50, maxPrice: 70 } },
+                    categories: { grains: { defaultPrice: 60 } },
+                    negotiationRules: { maxDiscount: 0.15 }
+                });
+                
+                const priceData = await priceEngine.getMarketPrice('rice', 'grains');
+                const isValid = priceData && typeof priceData.marketPrice === 'number';
+                
+                addResult('Price Discovery', isValid, 
+                    isValid ? `Market price: ₹${priceData.marketPrice}` : 'No price data returned');
+            } catch (error) {
+                addResult('Price Discovery', false, error.message);
+            }
+            
+            console.log('Quick test completed');
         }
-
-        // Test 1: No mock classes in runtime
-        const hasMockClasses = typeof window.MockSpeechRecognition !== 'undefined' || typeof window.MockSpeechSynthesis !== 'undefined';
-        addResult('No Mock Classes in Runtime', !hasMockClasses, 
-            hasMockClasses ? 'Mock classes found in runtime!' : 'Clean runtime - no mock classes');
-
-        // Test 2: Proper feature detection
-        const hasProperDetection = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-        addResult('Native Speech API Detection', hasProperDetection, 
-            hasProperDetection ? 'Native Speech Recognition API detected' : 'No native Speech API found');
-
-        // Test 3: Speech Synthesis detection
-        const hasSpeechSynthesis = !!(window.speechSynthesis && window.SpeechSynthesisUtterance);
-        addResult('Native Speech Synthesis Detection', hasSpeechSynthesis,
-            hasSpeechSynthesis ? 'Native Speech Synthesis API detected' : 'No native Speech Synthesis found');
-
-        // Test 4: HTML lang attribute
-        const htmlLang = document.documentElement.lang;
-        addResult('HTML Lang Attribute', htmlLang === 'en', 
-            `HTML lang attribute is "${htmlLang}"`);
-
-        // Test 5: SpeechRecognition not overridden (critical safety check)
-        const speechRecognitionNotOverridden = typeof window.MockSpeechRecognition === 'undefined' || 
-            (window.SpeechRecognition && window.SpeechRecognition !== window.MockSpeechRecognition);
-        addResult('SpeechRecognition Not Overridden', speechRecognitionNotOverridden,
-            speechRecognitionNotOverridden ? 'SpeechRecognition uses native browser implementation' : 'WARNING: Native API may be overridden!');
-
-        // Test 6: Test Environment
-        addResult('Test Environment', true, 'Basic runtime environment tests completed');
-
-        console.log('✅ Critical fixes verification completed');
-        console.log('🔍 Runtime is clean of mock code');
-        console.log('🎯 Using native browser APIs only');
+        
+        // Run test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runQuickTest, 100);
+        });
     </script>
 </body>
 </html>
