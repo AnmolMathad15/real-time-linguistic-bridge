@@ -1,5 +1,4 @@
-// Real-Time Linguistic Bridge - Clean Implementation
-// Component Classes First (Dependencies)
+// Real-Time Linguistic Bridge - Working Implementation
 
 class VoiceInterface {
     constructor() {
@@ -37,7 +36,7 @@ class VoiceInterface {
         this.recognition.onresult = (event) => {
             const result = event.results[0];
             const transcript = result[0].transcript;
-            const confidence = result[0].confidence;
+            const confidence = result[0].confidence || 0.8;
             
             console.log('Speech result:', transcript, 'Confidence:', confidence);
             
@@ -86,6 +85,7 @@ class VoiceInterface {
             return true;
         } catch (error) {
             console.error('Error starting speech recognition:', error);
+            this.isListening = false;
             if (this.onErrorCallback) {
                 this.onErrorCallback({ error: 'start_failed', message: error.message });
             }
@@ -95,7 +95,12 @@ class VoiceInterface {
 
     stopListening() {
         if (this.recognition && this.isListening) {
-            this.recognition.stop();
+            try {
+                this.recognition.stop();
+            } catch (error) {
+                console.error('Error stopping recognition:', error);
+            }
+            this.isListening = false;
         }
     }
 
@@ -242,17 +247,6 @@ class TranslationEngine {
     }
 
     async translate(text, fromLanguage, toLanguage, intent = null) {
-        const normalizedText = text.toLowerCase().trim();
-        
-        if (toLanguage === 'english' && this.tradeTerms[fromLanguage]) {
-            const terms = this.tradeTerms[fromLanguage];
-            for (const [english, foreign] of Object.entries(terms)) {
-                if (normalizedText.includes(foreign)) {
-                    return text.replace(new RegExp(foreign, 'gi'), english);
-                }
-            }
-        }
-        
         return text;
     }
 }
@@ -343,7 +337,6 @@ class NegotiationAssistant {
         try {
             const customerAnalysis = this.analyzeCustomer(intent, originalText);
             const counterOffers = this.generateCounterOffers(intent, priceData);
-            const tactics = this.suggestTactics(intent);
             
             return {
                 customerAnalysis,
@@ -420,10 +413,6 @@ class NegotiationAssistant {
         return offers;
     }
 
-    suggestTactics(intent) {
-        return this.strategies[intent.type] || this.strategies.casual_inquiry;
-    }
-
     calculateConfidence(intent, priceData) {
         let confidence = 0.5;
         if (intent.confidence > 0.7) confidence += 0.2;
@@ -475,7 +464,7 @@ class NegotiationAssistant {
 class ResponseGenerator {
     constructor() {
         this.responseTemplates = {
-            english: {
+            'en-US': {
                 price_guidance: {
                     with_price: "Current market price for {product} is ₹{price} per {unit}. {guidance}",
                     price_range: "For {product}, prices range from ₹{minPrice} to ₹{maxPrice} per {unit}. {guidance}",
@@ -492,38 +481,55 @@ class ResponseGenerator {
                     firm: "Maintain your price - this is fair."
                 }
             },
-            hindi: {
+            'hi-IN': {
                 price_guidance: {
-                    with_price: "Bazaar mein {product} ka daam ₹{price} per {unit} hai. {guidance}",
-                    price_range: "{product} ke liye ₹{minPrice} se ₹{maxPrice} per {unit} tak milta hai. {guidance}",
-                    no_price: "Mujhe {product} ka current rate nahi pata, lekin general guidance de sakta hun. {guidance}"
+                    with_price: "बाज़ार में {product} का दाम ₹{price} प्रति {unit} है। {guidance}",
+                    price_range: "{product} के लिए ₹{minPrice} से ₹{maxPrice} प्रति {unit} तक मिलता है। {guidance}",
+                    no_price: "मुझे {product} का वर्तमान रेट नहीं पता, लेकिन सामान्य मार्गदर्शन दे सकता हूं। {guidance}"
                 },
                 negotiation_advice: {
-                    counter_offer: "₹{price} per {unit} offer kar sakte hain. {reasoning}",
-                    accept_offer: "₹{price} per {unit} mein accha deal hai. {reasoning}",
-                    decline_offer: "Yeh price kam hai. {reasoning}"
+                    counter_offer: "₹{price} प्रति {unit} ऑफर कर सकते हैं। {reasoning}",
+                    accept_offer: "₹{price} प्रति {unit} में अच्छा डील है। {reasoning}",
+                    decline_offer: "यह प्राइस कम है। {reasoning}"
                 },
                 cultural_guidance: {
-                    respectful: "Negotiation mein respect rakhiye.",
-                    flexible: "Is product mein negotiation ho sakti hai.",
-                    firm: "Apna price maintain kariye - yeh fair hai."
+                    respectful: "बातचीत में सम्मान रखिए।",
+                    flexible: "इस प्रोडक्ट में बातचीत हो सकती है।",
+                    firm: "अपना प्राइस बनाए रखिए - यह उचित है।"
                 }
             },
-            kannada: {
+            'kn-IN': {
                 price_guidance: {
-                    with_price: "Market nalli {product} bele ₹{price} per {unit} ide. {guidance}",
-                    price_range: "{product} ge ₹{minPrice} to ₹{maxPrice} per {unit} sigutta. {guidance}",
-                    no_price: "Nanage {product} current rate gottilla, aadre general guidance kodabaudu. {guidance}"
+                    with_price: "ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ {product} ಬೆಲೆ ₹{price} ಪ್ರತಿ {unit} ಇದೆ। {guidance}",
+                    price_range: "{product} ಗೆ ₹{minPrice} ರಿಂದ ₹{maxPrice} ಪ್ರತಿ {unit} ವರೆಗೆ ಸಿಗುತ್ತದೆ। {guidance}",
+                    no_price: "ನನಗೆ {product} ಪ್ರಸ್ತುತ ದರ ಗೊತ್ತಿಲ್ಲ, ಆದರೆ ಸಾಮಾನ್ಯ ಮಾರ್ಗದರ್ಶನ ಕೊಡಬಹುದು। {guidance}"
                 },
                 negotiation_advice: {
-                    counter_offer: "₹{price} per {unit} offer maadabaudu. {reasoning}",
-                    accept_offer: "₹{price} per {unit} nalli chennaagide. {reasoning}",
-                    decline_offer: "Ee price kammi. {reasoning}"
+                    counter_offer: "₹{price} ಪ್ರತಿ {unit} ಆಫರ್ ಮಾಡಬಹುದು। {reasoning}",
+                    accept_offer: "₹{price} ಪ್ರತಿ {unit} ನಲ್ಲಿ ಚೆನ್ನಾಗಿದೆ। {reasoning}",
+                    decline_offer: "ಈ ಬೆಲೆ ಕಮ್ಮಿ। {reasoning}"
                 },
                 cultural_guidance: {
-                    respectful: "Negotiation nalli respect iddkoli.",
-                    flexible: "Ee product nalli negotiation maadabaudu.",
-                    firm: "Nimma price maintain maadi - idu fair."
+                    respectful: "ಮಾತುಕತೆಯಲ್ಲಿ ಗೌರವ ಇಟ್ಟುಕೊಳ್ಳಿ।",
+                    flexible: "ಈ ಉತ್ಪಾದನೆಯಲ್ಲಿ ಮಾತುಕತೆ ಮಾಡಬಹುದು।",
+                    firm: "ನಿಮ್ಮ ಬೆಲೆ ಕಾಪಾಡಿ - ಇದು ನ್ಯಾಯಯುತ।"
+                }
+            },
+            'ta-IN': {
+                price_guidance: {
+                    with_price: "சந்தையில் {product} விலை ₹{price} ஒரு {unit}க்கு உள்ளது। {guidance}",
+                    price_range: "{product}க்கு ₹{minPrice} முதல் ₹{maxPrice} ஒரு {unit}க்கு கிடைக்கும். {guidance}",
+                    no_price: "எனக்கு {product} தற்போதைய விலை தெரியாது, ஆனால் பொதுவான வழிகாட்டுதல் தர முடியும். {guidance}"
+                },
+                negotiation_advice: {
+                    counter_offer: "₹{price} ஒரு {unit}க்கு வழங்கலாம். {reasoning}",
+                    accept_offer: "₹{price} ஒரு {unit}க்கு நல்ல விலை। {reasoning}",
+                    decline_offer: "இந்த விலை குறைவு। {reasoning}"
+                },
+                cultural_guidance: {
+                    respectful: "பேச்சுவார்த்தையில் மரியாதை காட்டுங்கள்।",
+                    flexible: "இந்த பொருளில் பேச்சுவார்த்தை செய்யலாம்।",
+                    firm: "உங்கள் விலையை பராமரியுங்கள் - இது நியாயமானது।"
                 }
             }
         };
@@ -532,10 +538,12 @@ class ResponseGenerator {
     async formatResponse(data, language) {
         try {
             const { intent, priceData, negotiationGuidance } = data;
-            const responseLanguage = this.normalizeLanguage(language);
+            const responseLanguage = language || 'en-US';
             
-            const primaryResponse = this.generatePrimaryResponse(intent, priceData, responseLanguage);
-            const negotiationResponse = this.generateNegotiationResponse(negotiationGuidance, responseLanguage);
+            const templates = this.responseTemplates[responseLanguage] || this.responseTemplates['en-US'];
+            
+            const primaryResponse = this.generatePrimaryResponse(intent, priceData, templates);
+            const negotiationResponse = this.generateNegotiationResponse(negotiationGuidance, templates);
             
             const combinedResponse = [primaryResponse, negotiationResponse]
                 .filter(r => r && r.trim().length > 0)
@@ -554,13 +562,11 @@ class ResponseGenerator {
         }
     }
 
-    generatePrimaryResponse(intent, priceData, language) {
-        const templates = this.responseTemplates[language] || this.responseTemplates.english;
-        
+    generatePrimaryResponse(intent, priceData, templates) {
         if (!priceData) {
             return this.fillTemplate(templates.price_guidance.no_price, {
                 product: intent.product || 'this item',
-                guidance: 'Let me help you with what I can.'
+                guidance: templates.cultural_guidance.respectful
             });
         }
 
@@ -570,20 +576,19 @@ class ResponseGenerator {
                 minPrice: priceData.ranges.minimum,
                 maxPrice: priceData.ranges.premium,
                 unit: priceData.unit,
-                guidance: this.generatePriceGuidance(priceData, language)
+                guidance: this.generatePriceGuidance(priceData, templates)
             });
         } else {
             return this.fillTemplate(templates.price_guidance.with_price, {
                 product: priceData.product,
                 price: priceData.marketPrice,
                 unit: priceData.unit,
-                guidance: this.generatePriceGuidance(priceData, language)
+                guidance: this.generatePriceGuidance(priceData, templates)
             });
         }
     }
 
-    generatePriceGuidance(priceData, language) {
-        const templates = this.responseTemplates[language] || this.responseTemplates.english;
+    generatePriceGuidance(priceData, templates) {
         const flexibility = priceData.negotiation?.flexibility || 'moderate';
         
         switch (flexibility) {
@@ -596,12 +601,11 @@ class ResponseGenerator {
         }
     }
 
-    generateNegotiationResponse(negotiationGuidance, language) {
-        if (!negotiationGuidance.counterOffers || negotiationGuidance.counterOffers.length === 0) {
+    generateNegotiationResponse(negotiationGuidance, templates) {
+        if (!negotiationGuidance || !negotiationGuidance.counterOffers || negotiationGuidance.counterOffers.length === 0) {
             return '';
         }
 
-        const templates = this.responseTemplates[language] || this.responseTemplates.english;
         const recommendedOffer = negotiationGuidance.counterOffers.find(offer => offer.recommended);
         
         if (recommendedOffer && recommendedOffer.price) {
@@ -626,28 +630,16 @@ class ResponseGenerator {
         return filled.replace(/\{[^}]+\}/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    normalizeLanguage(language) {
-        const langMap = {
-            'en-US': 'english',
-            'hi-IN': 'hindi',
-            'kn-IN': 'kannada',
-            'english': 'english',
-            'hindi': 'hindi',
-            'kannada': 'kannada'
-        };
-        
-        return langMap[language] || 'english';
-    }
-
     createFallbackResponse(data, language, error) {
         const fallbackMessages = {
             'en-US': "I'm here to help with pricing questions. Please try again.",
-            'hi-IN': "Main aapke price ke sawal mein madad kar sakta hun. Phir se puchiye.",
-            'kn-IN': "Naanu nimma price questions nalli help maadabaudu. Mathe keli."
+            'hi-IN': "मैं आपके प्राइस के सवाल में मदद कर सकता हूं। फिर से पूछिए।",
+            'kn-IN': "ನಾನು ನಿಮ್ಮ ಬೆಲೆ ಪ್ರಶ್ನೆಗಳಲ್ಲಿ ಸಹಾಯ ಮಾಡಬಹುದು। ಮತ್ತೆ ಕೇಳಿ।",
+            'ta-IN': "நான் உங்கள் விலை கேள்விகளில் உதவ முடியும். மீண்டும் கேளுங்கள்।"
         };
         
-        const responseLanguage = this.normalizeLanguage(language);
-        const fallbackText = fallbackMessages[language] || fallbackMessages['en-US'];
+        const responseLanguage = language || 'en-US';
+        const fallbackText = fallbackMessages[responseLanguage] || fallbackMessages['en-US'];
         
         return {
             text: fallbackText,
@@ -665,7 +657,7 @@ class ResponseGenerator {
                 speechSynthesis.cancel();
                 
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = this.getBrowserLanguage(language);
+                utterance.lang = language || 'en-US';
                 utterance.rate = 0.9;
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
@@ -679,15 +671,6 @@ class ResponseGenerator {
             return false;
         }
     }
-
-    getBrowserLanguage(language) {
-        const langMap = {
-            'english': 'en-US',
-            'hindi': 'hi-IN',
-            'kannada': 'kn-IN'
-        };
-        return langMap[language] || 'en-US';
-    }
 }
 
 class PrivacyManager {
@@ -696,7 +679,6 @@ class PrivacyManager {
     }
 
     validateNoDataPersistence() {
-        // Check for any persistent storage
         if (localStorage.length > 0 || sessionStorage.length > 0) {
             console.warn('Persistent storage detected - clearing for privacy');
             this.clearAnyExistingData();
@@ -704,12 +686,10 @@ class PrivacyManager {
     }
 
     clearAnyExistingData() {
-        // Clear any existing data
         this.temporaryData.clear();
     }
 
     clearAudioData() {
-        // Clear audio-related temporary data
         console.log('Audio data cleared for privacy');
     }
 
@@ -745,19 +725,16 @@ class AccessibilityManager {
     }
 
     detectUserPreferences() {
-        // Detect accessibility preferences
         this.userPreferences.screenReader = this.detectScreenReader();
     }
 
     detectScreenReader() {
-        // Simple screen reader detection
         return navigator.userAgent.includes('NVDA') || 
                navigator.userAgent.includes('JAWS') || 
                window.speechSynthesis !== undefined;
     }
 
     handleTabNavigation(event) {
-        // Handle tab navigation
         console.log('Tab navigation handled');
     }
 }
@@ -794,15 +771,13 @@ class CulturalContextManager {
     }
 
     filterResponse(response, language) {
-        // Apply cultural filtering to responses
         return response;
     }
 }
 
-// Main Application Class (After all dependencies)
+// Main Application Class
 class LinguisticBridge {
     constructor() {
-        // Initialize all components
         this.voiceInterface = new VoiceInterface();
         this.intentClassifier = new IntentClassifier();
         this.translationEngine = new TranslationEngine();
@@ -829,7 +804,6 @@ class LinguisticBridge {
     }
 
     initializeUI() {
-        // Get DOM elements safely
         this.micButton = document.getElementById('micButton');
         this.languageSelect = document.getElementById('language');
         this.listeningIndicator = document.getElementById('listeningIndicator');
@@ -837,46 +811,60 @@ class LinguisticBridge {
         this.responseText = document.getElementById('responseText');
         this.statusMessage = document.getElementById('statusMessage');
         this.speakButton = document.getElementById('speakButton');
+        this.tutorialButton = document.getElementById('tutorialButton');
+        this.tutorialModal = document.getElementById('tutorialModal');
+        this.closeTutorial = document.getElementById('closeTutorial');
 
-        // Check if we have required elements
         if (!this.micButton) {
             console.log('UI elements not found - running in test mode');
             return;
         }
 
-        // Set up event listeners
         this.setupEventListeners();
-        
-        // Check browser compatibility
         this.checkBrowserCompatibility();
     }
 
     setupEventListeners() {
-        // Microphone button
-        this.micButton.addEventListener('click', () => this.handleVoiceInput());
+        this.micButton.addEventListener('click', () => {
+            if (!this.isProcessing) {
+                this.handleVoiceInput();
+            }
+        });
         
-        // Language selection
         if (this.languageSelect) {
             this.languageSelect.addEventListener('change', (e) => {
                 this.currentLanguage = e.target.value;
+                console.log('Language changed to:', this.currentLanguage);
             });
         }
         
-        // Speak button
         if (this.speakButton) {
             this.speakButton.addEventListener('click', () => this.speakResponse());
         }
 
-        // Voice interface callbacks
+        if (this.tutorialButton && this.tutorialModal) {
+            this.tutorialButton.addEventListener('click', () => {
+                this.tutorialModal.classList.remove('hidden');
+            });
+        }
+
+        if (this.closeTutorial && this.tutorialModal) {
+            this.closeTutorial.addEventListener('click', () => {
+                this.tutorialModal.classList.add('hidden');
+            });
+        }
+
         this.voiceInterface.onSpeechResult((result) => this.processVoiceInput(result));
         this.voiceInterface.onError((error) => this.handleVoiceError(error));
     }
 
     checkBrowserCompatibility() {
         if (!VoiceInterface.isSupported()) {
-            this.showStatus('Speech recognition not supported. Please use Chrome or Edge.', 'warning');
-            this.micButton.disabled = true;
-            this.micButton.style.opacity = '0.5';
+            this.showStatus('Speech recognition not supported. Please use Chrome or Edge.', 'error');
+            if (this.micButton) {
+                this.micButton.disabled = true;
+                this.micButton.style.opacity = '0.5';
+            }
         }
     }
 
@@ -894,7 +882,6 @@ class LinguisticBridge {
         this.privacyManager.validateNoDataPersistence();
         this.privacyManager.startPrivacyMonitoring();
         
-        // Auto-clear data periodically
         setInterval(() => {
             this.privacyManager.clearTemporaryData();
         }, 30000);
@@ -917,31 +904,49 @@ class LinguisticBridge {
         }
 
         if (!VoiceInterface.isSupported()) {
-            this.showStatus('Speech recognition not supported in this browser.', 'error');
+            this.showStatus('Speech recognition not supported in this browser. Please use Chrome or Edge.', 'error');
             return;
         }
 
         if (this.voiceInterface.isListening) {
             this.voiceInterface.stopListening();
+            this.stopListening();
         } else {
             this.startListening();
         }
     }
 
     startListening() {
-        this.responseSection.classList.add('hidden');
+        if (this.responseSection) {
+            this.responseSection.classList.add('hidden');
+        }
         this.hideStatus();
         
         this.showStatus('Listening...', 'info');
-        this.micButton.classList.add('listening');
-        this.listeningIndicator.classList.remove('hidden');
+        if (this.micButton) {
+            this.micButton.classList.add('listening');
+        }
+        if (this.listeningIndicator) {
+            this.listeningIndicator.classList.remove('hidden');
+        }
         
-        this.voiceInterface.startListening(this.currentLanguage);
+        const selectedLanguage = this.languageSelect ? this.languageSelect.value : 'en-US';
+        console.log('Starting recognition with language:', selectedLanguage);
+        
+        const started = this.voiceInterface.startListening(selectedLanguage);
+        if (!started) {
+            this.stopListening();
+            this.showStatus('Failed to start voice recognition. Please try again.', 'error');
+        }
     }
 
     stopListening() {
-        this.micButton.classList.remove('listening');
-        this.listeningIndicator.classList.add('hidden');
+        if (this.micButton) {
+            this.micButton.classList.remove('listening');
+        }
+        if (this.listeningIndicator) {
+            this.listeningIndicator.classList.add('hidden');
+        }
         this.hideStatus();
     }
 
@@ -953,24 +958,15 @@ class LinguisticBridge {
             this.showStatus('Processing your request...', 'info');
             this.privacyManager.clearAudioData();
 
-            // Step 1: Classify intent
+            const currentLanguage = this.languageSelect ? this.languageSelect.value : 'en-US';
+            console.log('Processing voice input in language:', currentLanguage);
+
+            const languageCode = this.getLanguageCode(currentLanguage);
             const intent = await this.intentClassifier.classifyIntent(
                 voiceResult.text, 
-                this.getLanguageCode(this.currentLanguage)
+                languageCode
             );
 
-            // Step 2: Translate if needed
-            let processedText = voiceResult.text;
-            if (this.currentLanguage !== 'en-US') {
-                processedText = await this.translationEngine.translate(
-                    voiceResult.text,
-                    this.getLanguageCode(this.currentLanguage),
-                    'english',
-                    intent
-                );
-            }
-
-            // Step 3: Get price information
             let priceData = null;
             if (intent.type === 'bargaining' || intent.type === 'bulk_purchase') {
                 priceData = await this.priceDiscoveryEngine.getMarketPrice(
@@ -979,26 +975,23 @@ class LinguisticBridge {
                 );
             }
 
-            // Step 4: Get negotiation guidance
             const negotiationGuidance = await this.negotiationAssistant.generateGuidance(
                 intent,
                 priceData,
-                processedText
+                voiceResult.text
             );
 
-            // Step 5: Generate response
             const response = await this.responseGenerator.formatResponse(
                 {
                     intent,
                     priceData,
                     negotiationGuidance,
-                    originalText: voiceResult.text,
-                    processedText: processedText
+                    originalText: voiceResult.text
                 },
-                this.getLanguageCode(this.currentLanguage)
+                currentLanguage
             );
 
-            this.displayResponse(response, priceData);
+            this.displayResponse(response, priceData, intent);
             this.hideStatus();
 
         } catch (error) {
@@ -1010,17 +1003,72 @@ class LinguisticBridge {
         }
     }
 
-    displayResponse(response, priceData) {
-        this.responseText.textContent = response.text;
-        this.responseSection.classList.remove('hidden');
+    displayResponse(response, priceData, intent) {
+        if (this.responseText) {
+            this.responseText.textContent = response.text;
+        }
+        if (this.responseSection) {
+            this.responseSection.classList.remove('hidden');
+        }
         this.lastResponse = response;
+        
+        this.updateInfoCards(priceData, intent);
+    }
+
+    updateInfoCards(priceData, intent) {
+        const priceInfo = document.getElementById('priceInfo');
+        const negotiationTips = document.getElementById('negotiationTips');
+        
+        if (priceData && priceInfo) {
+            priceInfo.classList.remove('hidden');
+            const content = priceInfo.querySelector('.info-content');
+            if (content) {
+                content.innerHTML = `
+                    <p><strong>Market Price:</strong> ₹${priceData.marketPrice} per ${priceData.unit}</p>
+                    <p><strong>Price Range:</strong> ₹${priceData.ranges?.minimum || priceData.minPrice} - ₹${priceData.ranges?.premium || priceData.maxPrice}</p>
+                    <p><strong>Negotiation:</strong> ${priceData.negotiation?.flexibility || 'Moderate'} flexibility</p>
+                `;
+            }
+        }
+        
+        if (intent && negotiationTips) {
+            negotiationTips.classList.remove('hidden');
+            const content = negotiationTips.querySelector('.info-content');
+            if (content) {
+                const tips = this.getTipsForIntent(intent.type);
+                content.innerHTML = `<ul>${tips.map(tip => `<li>${tip}</li>`).join('')}</ul>`;
+            }
+        }
+    }
+
+    getTipsForIntent(intentType) {
+        const tipMap = {
+            bargaining: [
+                'Start with a reasonable offer',
+                'Emphasize product quality',
+                'Be prepared to negotiate'
+            ],
+            bulk_purchase: [
+                'Highlight volume benefits',
+                'Offer tiered pricing',
+                'Build long-term relationship'
+            ],
+            casual_inquiry: [
+                'Provide helpful information',
+                'Build trust and rapport',
+                'Be patient and respectful'
+            ]
+        };
+        
+        return tipMap[intentType] || tipMap.casual_inquiry;
     }
 
     speakResponse() {
         if (this.lastResponse) {
+            const currentLanguage = this.languageSelect ? this.languageSelect.value : 'en-US';
             this.responseGenerator.generateSpeech(
                 this.lastResponse.text,
-                this.getLanguageCode(this.currentLanguage)
+                currentLanguage
             );
         }
     }
@@ -1036,33 +1084,44 @@ class LinguisticBridge {
                 errorMessage = 'No speech detected. Please speak clearly and try again.';
                 break;
             case 'not-allowed':
-                errorMessage = 'Microphone access denied. Please allow microphone access.';
+                errorMessage = 'Microphone access denied. Please allow microphone access and try again.';
                 break;
             case 'network':
-                errorMessage = 'Network error. Please check your connection.';
+                errorMessage = 'Network error. Please check your connection and try again.';
+                break;
+            case 'start_failed':
+                errorMessage = 'Failed to start voice recognition. Please try again.';
                 break;
             default:
                 errorMessage = 'Speech recognition error. Please try again.';
         }
         
         this.showStatus(errorMessage, 'error');
+        console.error('Voice error:', error);
     }
 
     showStatus(message, type) {
-        this.statusMessage.textContent = message;
-        this.statusMessage.className = `status-message ${type}`;
-        this.statusMessage.classList.remove('hidden');
+        if (this.statusMessage) {
+            this.statusMessage.textContent = message;
+            this.statusMessage.className = `status-message ${type}`;
+            this.statusMessage.classList.remove('hidden');
+        }
     }
 
     hideStatus() {
-        this.statusMessage.classList.add('hidden');
+        if (this.statusMessage) {
+            this.statusMessage.classList.add('hidden');
+        }
     }
 
     getLanguageCode(browserLang) {
         const langMap = {
             'en-US': 'english',
             'hi-IN': 'hindi',
-            'kn-IN': 'kannada'
+            'kn-IN': 'kannada',
+            'ta-IN': 'tamil',
+            'te-IN': 'telugu',
+            'bn-IN': 'bengali'
         };
         return langMap[browserLang] || 'english';
     }
@@ -1077,3 +1136,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.VoiceInterface = VoiceInterface;
 window.IntentClassifier = IntentClassifier;
 window.ResponseGenerator = ResponseGenerator;
+window.LinguisticBridge = LinguisticBridge;

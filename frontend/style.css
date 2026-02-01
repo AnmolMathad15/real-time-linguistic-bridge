@@ -309,6 +309,7 @@ body {
     gap: var(--space-4);
 }
 
+/* Microphone button improvements */
 .mic-button {
     position: relative;
     width: 120px;
@@ -336,9 +337,20 @@ body {
     transform: translateY(0);
 }
 
+.mic-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .mic-button.listening {
     background: linear-gradient(135deg, var(--error-500), var(--error-600));
     animation: pulse-mic 2s infinite;
+}
+
+.mic-button.processing {
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+    cursor: wait;
 }
 
 .mic-ripple {
@@ -617,7 +629,7 @@ body {
     font-weight: bold;
 }
 
-/* Status Messages */
+/* Status message improvements */
 .status-message {
     background: white;
     border-radius: var(--radius-xl);
@@ -626,12 +638,15 @@ body {
     border: 1px solid var(--gray-200);
     font-weight: 500;
     text-align: center;
+    transition: all 0.3s ease;
+    transform: translateY(0);
 }
 
 .status-message.error {
     background: var(--error-50);
     color: var(--error-700);
     border-color: var(--error-200);
+    animation: shake 0.5s ease-in-out;
 }
 
 .status-message.success {
@@ -644,6 +659,12 @@ body {
     background: var(--primary-50);
     color: var(--primary-700);
     border-color: var(--primary-200);
+}
+
+.status-message.warning {
+    background: var(--warning-50);
+    color: var(--warning-700);
+    border-color: var(--warning-200);
 }
 
 /* Footer */
@@ -825,6 +846,12 @@ body {
     border: 0;
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
 /* Animations */
 @keyframes pulse-mic {
     0%, 100% {
@@ -834,6 +861,22 @@ body {
     50% {
         transform: scale(1.05);
         box-shadow: var(--shadow-2xl), 0 0 0 10px rgba(239, 68, 68, 0.1);
+    }
+}
+
+.mic-button.processing {
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+    animation: pulse-processing 1.5s infinite;
+}
+
+@keyframes pulse-processing {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 0.9;
     }
 }
 
